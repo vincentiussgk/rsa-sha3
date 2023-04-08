@@ -1,5 +1,6 @@
 import hashlib
 import random
+import decimal
 
 # RSA Algorithm
 def prime(a):
@@ -19,21 +20,28 @@ def fpb(a, b):
     return fpb
 
 def createPubKey(a):
-    e = 0
-    while(e != 1):
-        e = fpb(random.randrange(1, a), a)
-    return e
+    c = 0
+    while(c != 1):
+        pubKey = random.randrange(1, a)
+        c = fpb(pubKey, a)
+    return pubKey
   
-def createPrivKey(n, e):
-    while(d)
-    d = (1+(1*))    
-def encryptKey(p, q):
+def createPrivKey(totient, e):
+    k = 1
+    d = (1+(k*totient))/e   
+    while(d != int(d)):
+        k += 1
+        d = (1+(k*totient))/e
+    return int(d)     
+
+def getKey(p, q):
     if(prime(p) and prime(q)):
         n = p*q
         totient = (p-1)*(q-1)
         pubKey = createPubKey(totient)
+        privKey = createPrivKey(totient, pubKey)
+        return pubKey, privKey
         
-
 
 def getMessage(filename):
     file = open(filename, 'r')
@@ -63,7 +71,7 @@ def getSignature(filename):
 
 # Hash text
 def hashText(text):
-    msgDigest  = hashlib.sha3_512(text.encode('UTF-8'))
+    msgDigest  = hashlib.sha3_256(text.encode('UTF-8'))
     msgHex = msgDigest.hexdigest()
     msgDec = int(msgHex,16)
     return msgDec
@@ -90,4 +98,18 @@ def saveSignatureSeparated(signature):
     signTags = '<ds>' + str(signature) + '</ds>'
     newFile.write(signTags)
 
-print(hashText('asdf'))
+p = 47
+q = 71
+n = p*q
+pubKey, privKey = getKey(p, q)
+print(pubKey, privKey)
+# print(hashText('asdf'))
+
+text = input("Teks:")
+print(text)
+hashDigest = hashText(text)
+print(hashDigest)
+encrypt = encryptSignature(hashDigest, privKey, n)
+print(encrypt)
+decrypt = decryptSignature(encrypt, pubKey, n)
+print(decrypt)

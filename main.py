@@ -1,6 +1,5 @@
 import hashlib
 import random
-import decimal
 
 # RSA Algorithm
 def prime(a):
@@ -82,8 +81,8 @@ def encryptSignature(hashDigest, privKey, n):
 def decryptSignature(signature, publicKey, n):
     return (signature**publicKey) % n
 
-def isSignatureAuthentic(hashDigest, hashDecrypt):
-    return hashDigest == hashDecrypt
+def isSignatureAuthentic(hashDigest, n, decryptSignature):
+    return decryptSignature == (hashDigest%n)
 
 def insertSignature(filename, signature):
     file = open(filename, 'r')
@@ -98,8 +97,10 @@ def saveSignatureSeparated(signature):
     signTags = '<ds>' + str(signature) + '</ds>'
     newFile.write(signTags)
 
-p = 47
-q = 71
+p = input("p: ")
+q = input("q: ")
+p = int(p)
+q = int(q)
 n = p*q
 pubKey, privKey = getKey(p, q)
 print(pubKey, privKey)
@@ -113,3 +114,6 @@ encrypt = encryptSignature(hashDigest, privKey, n)
 print(encrypt)
 decrypt = decryptSignature(encrypt, pubKey, n)
 print(decrypt)
+print(hashDigest%n)
+
+print(isSignatureAuthentic(hashDigest, n, decrypt))

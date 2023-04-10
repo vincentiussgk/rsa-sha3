@@ -114,23 +114,9 @@ def saveSignatureSeparated(signature):
     signTags = '<ds>' + str(signature) + '</ds>'
     newFile.write(signTags)
 
-# More complex functions
-
 def saveGeneratedKeys(pubKey, privKey):
     privFile = open('key.pri', 'w')
     privFile.write(str(privKey))
 
     pubFile = open('key.pub', 'w')
     pubFile.write(str(pubKey))
-
-# text = input("Teks:")
-# print(text)
-# hashDigest = hashText(text)
-# print(hashDigest)
-# encrypt = encryptSignature(hashDigest, privKey, n)
-# print(encrypt)
-# decrypt = decryptSignature(encrypt, pubKey, n)
-# print(decrypt)
-# print(hashDigest%n)
-
-# print(isSignatureAuthentic(hashDigest, n, decrypt))

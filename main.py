@@ -132,8 +132,6 @@ class KeysUI(Frame):
         p = self.pTextbox.get()
         q = self.qTextbox.get()
 
-        print(p,q)
-
         if not p or not q:
             messagebox.showinfo(title="Error!", message="Please enter both your p and q values.")
         else:
@@ -177,6 +175,24 @@ class VerificationUI(Frame):
             command = self.loadMessage
         )
         loadMessageButton.pack()
+
+        pLabel = Label(
+            self,
+            text="p"
+        )
+        pLabel.pack()
+
+        self.pTextbox = Entry(self)
+        self.pTextbox.pack()
+
+        qLabel = Label(
+            self,
+            text="q"
+        )
+        qLabel.pack()
+
+        self.qTextbox = Entry(self)
+        self.qTextbox.pack()
 
         signatureStorage = Checkbutton(self,text='Separate signature',variable=self.isStoredSeparately, onvalue=1, offvalue=0)
         signatureStorage.pack()
@@ -223,7 +239,7 @@ class VerificationUI(Frame):
             signature, message = getSignatureAndMessage(textfile)
 
         if not signature:
-            messagebox.showinfo(self,title="Error!", message="Signature not detected. Did you store the signature separately?")
+            messagebox.showinfo(title="Error!", message="Signature not detected. Did you store the signature separately?")
         else:
             fileNameLabel = Label(
                 self,
@@ -241,16 +257,27 @@ class VerificationUI(Frame):
         except:
             messagebox.showinfo(title="Error!", message="Public key not detected.")
 
-        hashDigest = int(hashText(self.messageVar.get()))
-        # TODO: figure out what to do with n
-        decryptedSignature = decryptSignature(self.signatureVar.get(), pubKey, n = 23*7)
+        p = self.pTextbox.get()
+        q = self.qTextbox.get()
 
-        isSignatureAuthentic = authenticateSignature(hashDigest, decryptedSignature, n = 23*7)
-        print(isSignatureAuthentic)
-        if isSignatureAuthentic:
-            messagebox.showinfo(title="Success!", message="Signature is verified as authentic.")
+        if not p or not q:
+            messagebox.showinfo(title="Error!", message="Please enter both your p and q values.")
+        
         else:
-            messagebox.showinfo(title="Error!", message="Signature is not authentic!")
+            hashDigest = int(hashText(self.messageVar.get()))
+
+            signature = self.signatureVar.get()
+
+            if not (self.isStoredSeparately.get()):
+                signature = getSignature(self.msgFilePath.get())
+
+            decryptedSignature = decryptSignature(signature, pubKey, int(p)*int(q))
+
+            isSignatureAuthentic = authenticateSignature(hashDigest, decryptedSignature, int(p)*int(q))
+            if isSignatureAuthentic:
+                messagebox.showinfo(title="Success!", message="Signature is verified as authentic.")
+            else:
+                messagebox.showinfo(title="Error!", message="Signature is not authentic!")
 
 class SignageUI(Frame):
     def __init__(self, parent, controller):
@@ -279,6 +306,24 @@ class SignageUI(Frame):
             command = self.loadMessage
         )
         loadMessageButton.pack()
+
+        pLabel = Label(
+            self,
+            text="p"
+        )
+        pLabel.pack()
+
+        self.pTextbox = Entry(self)
+        self.pTextbox.pack()
+
+        qLabel = Label(
+            self,
+            text="q"
+        )
+        qLabel.pack()
+
+        self.qTextbox = Entry(self)
+        self.qTextbox.pack()
 
         signatureStorage = Checkbutton(self,text='Store signature separately',variable=self.isStoredSeparately, onvalue=1, offvalue=0)
         signatureStorage.pack()
@@ -333,16 +378,22 @@ class SignageUI(Frame):
         except:
             messagebox.showinfo(title="Error!", message="Private key not detected.")
 
-        hashDigest = int(hashText(self.message.get()))
-        # TODO: figure out what to do with n
-        signature = encryptSignature(hashDigest, privKey, n = 23*7)
+        p = self.pTextbox.get()
+        q = self.qTextbox.get()
 
-        if self.isStoredSeparately.get():
-            saveSignatureSeparated(signature)
-            messagebox.showinfo(title="Success!", message="Signature successfully stored separately in file signature.txt.")
+        if not p or not q:
+            messagebox.showinfo(title="Error!", message="Please enter both your p and q values.")
+
         else:
-            insertSignature(self.msgFilePath.get(), signature)
-            messagebox.showinfo(title="Success!", message="Signature successfully stored in file " + self.msgFileName.get() + ".")
+            hashDigest = int(hashText(self.message.get()))
+            signature = encryptSignature(hashDigest, int(privKey), int(p)*int(q))
+
+            if self.isStoredSeparately.get():
+                saveSignatureSeparated(signature)
+                messagebox.showinfo(title="Success!", message="Signature successfully stored separately in file signature.txt.")
+            else:
+                insertSignature(self.msgFilePath.get(), signature)
+                messagebox.showinfo(title="Success!", message="Signature successfully stored in file " + self.msgFileName.get() + ".")
 
 # Start the app
 root = Main()
